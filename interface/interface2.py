@@ -4,15 +4,23 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog
-from PyQt5.QtCore import QDate, Qt
 import pandas as pd
+import datetime
+
+def __init__(self):
+    self.fecha_inicial = None
+    self.fecha_final = None
+    self.df = None
 
 
 class Ui_MainWindow(object):
-   
     def setupUi(self, MainWindow):
-        MainWindow.setObjectName("DataCleanPy")
-        MainWindow.resize(1023, 480)
+        def __init__(self):
+          self.fecha_inicial = None
+          self.fecha_final = None
+          self.df = None
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(1023, 498)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.widget = QtWidgets.QWidget(self.centralwidget)
@@ -46,16 +54,22 @@ class Ui_MainWindow(object):
 "border-color: rgb(0, 0, 0);\n"
 "font-weight: bold;\n"
 "")
+        
         self.pushButton_.setObjectName("pushButton_")
         self.graphicsView = QtWidgets.QGraphicsView(self.widget)
-        self.graphicsView.setGeometry(QtCore.QRect(0, 30, 781, 371))
+        self.graphicsView.setGeometry(QtCore.QRect(0, 30, 781, 401))
         self.graphicsView.setStyleSheet("background: rgb(255, 255, 255);\n"
 "border-color: rgb(0, 0, 0)")
         self.graphicsView.setObjectName("graphicsView")
+
         self.scene = QtWidgets.QGraphicsScene(self.graphicsView)
         self.graphicsView.setScene(self.scene)
+        self.pushButton_.clicked.connect(self.salir)
+        self.ButtoBorrarTodo.clicked.connect(self.borrarTodo)
+
+        
         self.groupBox = QtWidgets.QGroupBox(self.widget)
-        self.groupBox.setGeometry(QtCore.QRect(780, 30, 251, 371))
+        self.groupBox.setGeometry(QtCore.QRect(780, 30, 251, 401))
         self.groupBox.setStyleSheet("background: rgb(165, 200, 202)")
         self.groupBox.setTitle("")
         self.groupBox.setObjectName("groupBox")
@@ -67,7 +81,7 @@ class Ui_MainWindow(object):
         self.comboBoxTipo.addItem("")
         self.comboBoxTipo.addItem("")
         self.label = QtWidgets.QLabel(self.groupBox)
-        self.label.setGeometry(QtCore.QRect(20, 60, 141, 16))
+        self.label.setGeometry(QtCore.QRect(20, 60, 171, 16))
         self.label.setStyleSheet("font-weight: bold;\n"
 "")
         self.label.setObjectName("label")
@@ -93,7 +107,7 @@ class Ui_MainWindow(object):
         self.FinalDate.setGeometry(QtCore.QRect(70, 130, 141, 22))
         self.FinalDate.setObjectName("FinalDate")
         self.label_5 = QtWidgets.QLabel(self.groupBox)
-        self.label_5.setGeometry(QtCore.QRect(20, 270, 101, 16))
+        self.label_5.setGeometry(QtCore.QRect(20, 270, 121, 16))
         self.label_5.setStyleSheet("font-weight: bold;\n"
 "")
         self.label_5.setObjectName("label_5")
@@ -115,11 +129,17 @@ class Ui_MainWindow(object):
         self.ButtonAplicar.setStyleSheet("font-weight: bold;\n"
 "")
         self.ButtonAplicar.setObjectName("ButtonAplicar")
+        self.message = QtWidgets.QLineEdit(self.groupBox)
+        self.message.setGeometry(QtCore.QRect(20, 360, 201, 20))
+        self.message.setObjectName("message")
+        self.message.setReadOnly(True)
+
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
-        self.pushButton_.clicked.connect(self.salir)
+        
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -142,7 +162,6 @@ class Ui_MainWindow(object):
         self.label_5.setText(_translate("MainWindow", "Nombre del sensor:"))
         self.label_6.setText(_translate("MainWindow", "Tipo de datos:"))
         self.ButtonAplicar.setText(_translate("MainWindow", "Aplicar"))
-
 
 #Función para abrir archivo
     def cargarArchivo(self):
@@ -168,18 +187,38 @@ class Ui_MainWindow(object):
                                         continue  # Salta esta línea si hay un error en los campos numéricos
 
         # Crea un DataFrame a partir de los datos válidos
-        df = pd.DataFrame(datosValidos, columns=columns)
+        self.df = pd.DataFrame(datosValidos, columns=columns)
 
         # Almacenar el nombre del sensor y el tipo de dato
-        sensorName = df.iloc[0, 2]
-        dataType = df.iloc[0, 3]
+        sensorName = self.df.iloc[0, 2]
+        dataType = self.df.iloc[0, 3]
         # Eliminar las columnas "Timestamps1", "Sensor" y "TipoDato" del DataFrame
-        df = df.drop(["Timestamp1", "Sensor", "Data Type"], axis=1)
+        self.df = self.df.drop(["Timestamp1", "Sensor", "Data Type"], axis=1)
         self.LabelNombreSensor.setText(sensorName)
         self.LabelTipodeDato.setText(dataType)
         
-        ##self.graficarDatos(df)
+        # Eliminar el "0" al principio de los timestamps y convertirlos a fechas
+        self.df['Timestamps'] = self.df['Timestamps'].apply(lambda x: str(x)[1:])  # Eliminar el "0" al principio
+        self.df['Timestamps'] = pd.to_datetime(self.df['Timestamps'].astype(int), unit='s') # Convertir a fechas
 
+        # Obtener el timestamp mínimo y máximo del DataFrame
+        min_timestamp = self.df['Timestamps'].min()
+        max_timestamp = self.df['Timestamps'].max()
+
+        # Configurar el rango en los QDateEdit
+        fecha_min = min_timestamp.to_pydatetime()
+        qdate_min = fecha_min.date()
+        self.InicialDate.setDate(qdate_min)
+
+        fecha_max = max_timestamp.to_pydatetime()
+        qdate_max = fecha_max.date()
+        self.FinalDate.setDate(qdate_max)
+        
+
+        ##self.graficarDatos(df)
+        
+        self.message.setPlaceholderText("Datos cargados con éxito")
+        
         print("Datos cargados con exito")
         
     def graficarDatos(self, df):
@@ -204,9 +243,17 @@ class Ui_MainWindow(object):
         ax.set_xlabel('Timestamps')
         ax.set_ylabel('Values')
 
-        
         # Mostrar la figura en el lienzo
         canvas.draw()
+        # Función para borrar todo
+    def borrarTodo(self):
+         # Borrar el DataFrame si existe
+        if self.df is not None:
+                self.df = None
+                self.LabelNombreSensor.clear()
+                self.LabelTipodeDato.clear()
+                self.message.setPlaceholderText("Datos borrados con éxito")
+
 
     def salir(self):
         # Cerrar la ventana
@@ -216,13 +263,14 @@ class Ui_MainWindow(object):
         if self.scene:
             self.scene.clear()
 
+
 if __name__ == "__main__":
-        app = QtWidgets.QApplication(sys.argv)
-        MainWindow = QtWidgets.QMainWindow()
-        ui = Ui_MainWindow()
-        ui.setupUi(MainWindow)
-
-        ui.ButtonCargar.clicked.connect(ui.cargarArchivo)
-
-        MainWindow.show()
-        sys.exit(app.exec_())
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(MainWindow)
+    ui.ButtonCargar.clicked.connect(ui.cargarArchivo)
+    ui.ButtoBorrarTodo.clicked.connect(ui.borrarTodo)
+    MainWindow.show()
+    sys.exit(app.exec_())
