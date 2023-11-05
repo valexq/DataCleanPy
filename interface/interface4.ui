@@ -287,7 +287,7 @@ border-color: rgb(0, 0, 0)</string>
      <widget class="QPushButton" name="ButtonAplicar">
       <property name="geometry">
        <rect>
-        <x>130</x>
+        <x>150</x>
         <y>260</y>
         <width>75</width>
         <height>23</height>
@@ -356,205 +356,25 @@ border-color: rgb(0, 0, 0)</string>
        </property>
       </item>
      </widget>
-     <widget class="QComboBox" name="comboInicio_2">
+     <widget class="QDateTimeEdit" name="dateTimeEdit">
       <property name="geometry">
        <rect>
         <x>100</x>
         <y>180</y>
-        <width>111</width>
+        <width>131</width>
         <height>22</height>
        </rect>
       </property>
-      <item>
-       <property name="text">
-        <string>1000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>2000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>3000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>4000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>5000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>6000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>7000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>8000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>9000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>10000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>11000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>12000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>13000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>14000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>15000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>16000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>17000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>1800</string>
-       </property>
-      </item>
      </widget>
-     <widget class="QComboBox" name="comboFinal">
+     <widget class="QDateTimeEdit" name="dateTimeEdit_2">
       <property name="geometry">
        <rect>
         <x>100</x>
         <y>220</y>
-        <width>111</width>
+        <width>131</width>
         <height>22</height>
        </rect>
       </property>
-      <item>
-       <property name="text">
-        <string>1000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>2000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>3000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>4000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>5000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>6000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>7000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>8000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>9000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>10000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>11000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>12000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>13000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>14000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>15000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>16000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>17000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>1800</string>
-       </property>
-      </item>
      </widget>
     </widget>
    </widget>

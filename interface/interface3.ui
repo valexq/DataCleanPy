@@ -170,7 +170,7 @@ border-color: rgb(0, 0, 0)</string>
 </string>
       </property>
       <property name="text">
-       <string>Rango de filtrado por fecha:</string>
+       <string>Rango de filtrado:</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_2">
@@ -193,8 +193,8 @@ border-color: rgb(0, 0, 0)</string>
      <widget class="QLabel" name="label_3">
       <property name="geometry">
        <rect>
-        <x>40</x>
-        <y>180</y>
+        <x>20</x>
+        <y>170</y>
         <width>47</width>
         <height>13</height>
        </rect>
@@ -210,8 +210,8 @@ border-color: rgb(0, 0, 0)</string>
      <widget class="QLabel" name="label_4">
       <property name="geometry">
        <rect>
-        <x>40</x>
-        <y>220</y>
+        <x>20</x>
+        <y>210</y>
         <width>47</width>
         <height>13</height>
        </rect>
@@ -276,7 +276,7 @@ border-color: rgb(0, 0, 0)</string>
        <rect>
         <x>110</x>
         <y>340</y>
-        <width>71</width>
+        <width>91</width>
         <height>16</height>
        </rect>
       </property>
@@ -306,8 +306,8 @@ border-color: rgb(0, 0, 0)</string>
        <rect>
         <x>20</x>
         <y>370</y>
-        <width>201</width>
-        <height>20</height>
+        <width>191</width>
+        <height>31</height>
        </rect>
       </property>
       <property name="readOnly">
@@ -356,15 +356,20 @@ border-color: rgb(0, 0, 0)</string>
        </property>
       </item>
      </widget>
-     <widget class="QComboBox" name="comboInicio_2">
+     <widget class="QComboBox" name="comborangoinicio">
       <property name="geometry">
        <rect>
-        <x>100</x>
-        <y>180</y>
-        <width>111</width>
+        <x>80</x>
+        <y>170</y>
+        <width>131</width>
         <height>22</height>
        </rect>
       </property>
+      <item>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </item>
       <item>
        <property name="text">
         <string>1000</string>
@@ -448,23 +453,23 @@ border-color: rgb(0, 0, 0)</string>
       <item>
        <property name="text">
         <string>17000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>1800</string>
        </property>
       </item>
      </widget>
-     <widget class="QComboBox" name="comboFinal">
+     <widget class="QComboBox" name="comborangofinal">
       <property name="geometry">
        <rect>
-        <x>100</x>
-        <y>220</y>
-        <width>111</width>
+        <x>80</x>
+        <y>210</y>
+        <width>131</width>
         <height>22</height>
        </rect>
       </property>
+      <item>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </item>
       <item>
        <property name="text">
         <string>1000</string>
@@ -548,11 +553,6 @@ border-color: rgb(0, 0, 0)</string>
       <item>
        <property name="text">
         <string>17000</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>1800</string>
        </property>
       </item>
      </widget>
