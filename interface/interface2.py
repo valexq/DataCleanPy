@@ -48,7 +48,7 @@ class Ui_MainWindow(object):
         "")
                 self.pushButton_.setObjectName("pushButton_")
                 self.graphicsView = QtWidgets.QGraphicsView(self.widget)
-                self.graphicsView.setGeometry(QtCore.QRect(0, 30, 781, 401))
+                self.graphicsView.setGeometry(QtCore.QRect(0, 30, 781, 450))
                 self.graphicsView.setStyleSheet("background: rgb(255, 255, 255);\n"
         "border-color: rgb(0, 0, 0)")
                 
@@ -251,6 +251,9 @@ class Ui_MainWindow(object):
                 self.comborangofinal.setItemText(16, _translate("MainWindow", "16000"))
                 self.comborangofinal.setItemText(17, _translate("MainWindow", "17000"))
 #Función para abrir archivo
+
+
+        
         def cargarDatos(self):
         # Abre una ventana de selección de archivo
                 options = QFileDialog.Options()
@@ -354,6 +357,20 @@ class Ui_MainWindow(object):
                 #canvas = FigureCanvas(figure)
                 #layout = QtWidgets.QVBoxLayout(self.graphicsView)
                 #layout.addWidget(canvas)
+                # ... (código previo)
+
+                # ... (código previo)
+
+              # ... (código previo)
+
+# ... (código posterior)
+
+# ... (código posterior)
+
+# ... (código posterior)
+                if self.df is None:
+                        self.message.setText("Cargue un archivo")
+                        return
                 self.ax.cla()
                 self.scene.clear()
 
@@ -376,9 +393,15 @@ class Ui_MainWindow(object):
                 
                 # Graficar los datos en el eje 'ax'
                 # Restricción para mostrar cada 1000 puntos
+                 # Restricción para mostrar cada 1000 puntos
                 interval = 1000
-                xticks = self.df['Timestamps'][::interval]
+                xticks_indices = range(0, len(self.df), interval)
+                xticks = self.df['Timestamps'].iloc[xticks_indices]
+                self.ax.tick_params(axis='x', rotation=45)  # Puedes ajustar el ángulo de rotación según tus preferencias
+
+                # Configurar las marcas de tiempo en el eje x
                 self.ax.set_xticks(xticks)
+                self.ax.set_xticklabels([str(i) for i in xticks_indices])
 
                 # Establecer límites del eje x para mostrar cada 12 horas
                 #start_timestamp =self. df['Timestamps'].min()
@@ -398,12 +421,12 @@ class Ui_MainWindow(object):
         # Mostrar la figura en el lienzo
                 self.canvas.draw()
                 #self.graficarDatos(self.df)
-                self.message.setText("Datos procesados y gráfica actualizada.")
+                self.message.setText("Datos procesados")
 
                 
                 
         def ButtonAplicarClicked(self):
-                if not self.archivo_cargado:
+                if self.df is None:
                         self.message.setText("Cargue un archivo antes de aplicar el filtro.")
                         return
                 self.aplicarFiltro()
