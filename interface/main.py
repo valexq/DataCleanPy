@@ -7,6 +7,8 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog
 import pandas as pd
 import datetime
 from PyQt5 import QtCore, QtGui, QtWidgets
+from scipy.signal import savgol_filter
+import numpy as np
 
 
 class Ui_MainWindow(object):
@@ -65,10 +67,6 @@ class Ui_MainWindow(object):
                 self.comboBoxTipo = QtWidgets.QComboBox(self.groupBox)
                 self.comboBoxTipo.setGeometry(QtCore.QRect(20, 100, 191, 22))
                 self.comboBoxTipo.setObjectName("comboBoxTipo")
-                self.comboBoxTipo.addItem("")
-                self.comboBoxTipo.addItem("")
-                self.comboBoxTipo.addItem("")
-                self.comboBoxTipo.addItem("")
                 self.label = QtWidgets.QLabel(self.groupBox)
                 self.label.setGeometry(QtCore.QRect(20, 140, 171, 16))
                 self.label.setStyleSheet("font-weight: bold;\n"
@@ -124,6 +122,8 @@ class Ui_MainWindow(object):
                 self.Comboboxtipodato = QtWidgets.QComboBox(self.groupBox)
                 self.Comboboxtipodato.setGeometry(QtCore.QRect(20, 50, 191, 22))
                 self.Comboboxtipodato.setObjectName("Comboboxtipodato")
+                self.Comboboxtipodato.addItem("")
+                self.Comboboxtipodato.addItem("")
                 self.Comboboxtipodato.addItem("")
                 self.Comboboxtipodato.addItem("")
                 self.Comboboxtipodato.addItem("")
@@ -185,6 +185,7 @@ class Ui_MainWindow(object):
 
                 
                 self.figure, self.ax = plt.subplots()
+                self.ax_smooth = self.ax.twinx()
                 self.canvas = FigureCanvas(self.figure)
                 self.layout = QtWidgets.QVBoxLayout(self.graphicsView)
                 self.layout.addWidget(self.canvas)
@@ -199,10 +200,11 @@ class Ui_MainWindow(object):
                 self.ButtoBorrarTodo.setText(_translate("MainWindow", "Borrar todo"))
                 self.ButtonDescargar.setText(_translate("MainWindow", "Descargar datos"))
                 self.pushButton_.setText(_translate("MainWindow", "Salir"))
-                self.comboBoxTipo.setItemText(0, _translate("MainWindow", "Ninguno"))
-                self.comboBoxTipo.setItemText(1, _translate("MainWindow", "Filtro de Kalmann"))
-                self.comboBoxTipo.setItemText(2, _translate("MainWindow", "Interpolación"))
-                self.comboBoxTipo.setItemText(3, _translate("MainWindow", "Por desviación estándar"))
+                self.comboBoxTipo.addItem("Ninguno")
+                self.comboBoxTipo.addItem("Filtro de Kalmann")
+                self.comboBoxTipo.addItem("Interpolación")
+                self.comboBoxTipo.addItem("Por desviación estándar")
+                self.comboBoxTipo.addItem("Suavizado")
                 self.label.setText(_translate("MainWindow", "Rango de filtrado por fecha:"))
                 self.label_2.setText(_translate("MainWindow", "Tipo de filtrado:"))
                 self.label_3.setText(_translate("MainWindow", "Inicio:"))
@@ -253,7 +255,8 @@ class Ui_MainWindow(object):
 #Función para abrir archivo
 
 
-        
+       
+
         def cargarDatos(self):
         # Abre una ventana de selección de archivo
                 options = QFileDialog.Options()
@@ -308,7 +311,51 @@ class Ui_MainWindow(object):
                 #fecha_max = max_timestamp.to_pydatetime()
                 #qdate_max = fecha_max.date()
                 #self.dateTimeEdit_2.setDate(qdate_max)
-                
+                self.graficarDatos3ConSuavizado()
+
+        
+
+        def graficarDatos3ConSuavizado(self):
+                if self.df is None:
+                        print("Cargue un archivo antes de graficar los datos.")
+                        return
+
+                start_index = 12000
+                end_index = 13000
+
+                # Convertir 'Timestamps' a índices numéricos
+                self.df['Timestamps'] = pd.to_numeric(self.df['Timestamps'], errors='coerce')
+
+                # Crear un DataFrame para el segmento de interés
+                segmento_df = self.df.iloc[start_index:end_index + 1]
+
+                # Crear el subgráfico
+                ax = self.figure.add_subplot(111)
+
+                # Graficar los datos originales
+                ax.plot(segmento_df['Timestamps'], segmento_df['Data 3'], label='Data 3 (Original)')
+
+                # Suavizar solo el segmento de datos específico
+                smoothed_data = savgol_filter(segmento_df['Data 3'], 101, 3)
+
+                # Crear un rango de índices correspondientes al segmento suavizado
+                smoothed_index_range = np.linspace(start_index, end_index, len(smoothed_data))
+
+                # Graficar los datos suavizados superpuestos
+                ax.plot(segmento_df['Timestamps'], smoothed_data, label='Data 3 (Smoothed)', color='orange')
+
+                # Configurar ejes y etiquetas
+                ax.set_xlabel('Timestamps')
+                ax.set_ylabel('Values')
+                ax.set_title('Data 3 - Original and Smoothed')
+                ax.legend()
+
+                # Ajustar el diseño para que no se superpongan las etiquetas del eje x
+                plt.tight_layout()
+
+                # Actualizar el lienzo con la nueva gráfica
+                self.canvas.draw()
+
         # Creamos una función para aplicar el filtro por desviación estándar
         def FiltroDesviacionEstandar(self):
                 mediaData1 = self.df['Data 1'].mean()
@@ -329,6 +376,8 @@ class Ui_MainWindow(object):
                 print('La desviación estándar dato 3:', deviationData3)
 
                 # Graficar los datos después de aplicar el filtro
+                
+
                 self.graficarDatos(self.df)
 
 
@@ -349,28 +398,21 @@ class Ui_MainWindow(object):
                         self.aplicarInterpolacion()
 
                 # Graficar los datos después de aplicar el filtro
-                self.graficarDatos(self.df)
+                self.graficarDatos(self.df, start_index, end_index)
 
-        def graficarDatos(self, df):
+
+
+        def graficarDatos(self, df, start_index=None, end_index=None):
                 # Crear una figura de Matplotlib y un lienzo para Qt
                 #figure, ax = plt.subplots()
                 #canvas = FigureCanvas(figure)
                 #layout = QtWidgets.QVBoxLayout(self.graphicsView)
                 #layout.addWidget(canvas)
-                # ... (código previo)
-
-                # ... (código previo)
-
-              # ... (código previo)
-
-# ... (código posterior)
-
-# ... (código posterior)
-
-# ... (código posterior)
+                
                 if self.df is None:
                         self.message.setText("Cargue un archivo")
                         return
+                self.ax_smooth.cla()
                 self.ax.cla()
                 self.scene.clear()
 
@@ -378,21 +420,21 @@ class Ui_MainWindow(object):
                 #ax.plot(df['Timestamps'], df['Data 1'], label='Data 1')
                 currentTipo = ui.Comboboxtipodato.currentText()
                 currentFiltro = ui.comboBoxTipo.currentText()
-                print('current tipo', currentTipo)
+                
 
                 if currentTipo == 'Dato 1' :
                         self.ax.plot(self.df['Timestamps'], self.df['Data 1'], label='Data 1')
                         self.message.setText("Data 1 graficada correctamente")
-
                 elif currentTipo == 'Dato 2' :
                         self.ax.plot(self.df['Timestamps'], self.df['Data 2'], label='Data 2')
                         self.message.setText("Data 2 graficada correctamente")
                 elif currentTipo == 'Dato 3':
                         self.ax.plot(self.df['Timestamps'], self.df['Data 3'], label='Data 3')
-                        self.message.setText("Data 2 graficada correctamente")
-                
+                        smoothed_data = savgol_filter(self.df['Data 3'], 101, 3)
+                        self.ax_smooth.plot(self.df['Timestamps'], smoothed_data, label='Data 3 (Smoothed)', color='orange')
+                        self.message.setText("Data 3 graficada correctamente")
+                                
                 # Graficar los datos en el eje 'ax'
-                # Restricción para mostrar cada 1000 puntos
                  # Restricción para mostrar cada 1000 puntos
                 interval = 1000
                 xticks_indices = range(0, len(self.df), interval)
@@ -402,7 +444,7 @@ class Ui_MainWindow(object):
                 # Configurar las marcas de tiempo en el eje x
                 self.ax.set_xticks(xticks)
                 self.ax.set_xticklabels([str(i) for i in xticks_indices])
-
+                self.ax.set_xlim(self.df['Timestamps'].iloc[start_index], self.df['Timestamps'].iloc[end_index])
                 # Establecer límites del eje x para mostrar cada 12 horas
                 #start_timestamp =self. df['Timestamps'].min()
                 #end_timestamp = self.df['Timestamps'].max()
@@ -418,13 +460,17 @@ class Ui_MainWindow(object):
                 self.ax.legend()
                 self.ax.set_xlabel('Timestamps')
                 self.ax.set_ylabel('Values')
-        # Mostrar la figura en el lienzo
+                # Ajustar automáticamente los límites del eje x
+                self.ax.autoscale()
+
+                # Mostrar la figura en el lienzo
                 self.canvas.draw()
+                
                 #self.graficarDatos(self.df)
                 self.message.setText("Datos procesados")
+          
+       
 
-                
-                
         def ButtonAplicarClicked(self):
                 if self.df is None:
                         self.message.setText("Cargue un archivo antes de aplicar el filtro.")
@@ -462,5 +508,6 @@ if __name__ == "__main__":
     ui.ButtonAplicar.clicked.connect(ui.graficarDatos)
     ui.ButtoBorrarTodo.clicked.connect(ui.borrarTodo)
     ui.pushButton_.clicked.connect(ui.ButtonAplicarClicked)
+    
     MainWindow.show()
     sys.exit(app.exec_())
