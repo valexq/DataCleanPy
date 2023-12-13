@@ -7,7 +7,6 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog
 import pandas as pd
 import datetime
 from scipy.signal import savgol_filter
-from filterpy.kalman import KalmanFilter
 import numpy as np
 
 
@@ -29,12 +28,6 @@ class Ui_MainWindow(object):
         "font: 75 8pt \"MS Shell Dlg 2\";\n"
         "font-weight: bold;\n""")
                 self.ButtonCargar.setObjectName("ButtonCargar")
-                self.ButtoBorrarTodo = QtWidgets.QPushButton(self.widget)
-                self.ButtoBorrarTodo.setGeometry(QtCore.QRect(220, 0, 101, 31))
-                self.ButtoBorrarTodo.setStyleSheet("background: rgb(132, 176, 177);\n"
-        "font-weight: bold;\n"
-        "\n""")
-                self.ButtoBorrarTodo.setObjectName("ButtoBorrarTodo")
                 self.ButtonDescargar = QtWidgets.QPushButton(self.widget)
                 self.ButtonDescargar.setGeometry(QtCore.QRect(100, 0, 121, 31))
                 self.ButtonDescargar.setStyleSheet("background: rgb(132, 176, 177);\n"
@@ -53,7 +46,7 @@ class Ui_MainWindow(object):
                 self.scene = QtWidgets.QGraphicsScene(self.graphicsView)
                 self.graphicsView.setScene(self.scene)
                 self.pushButton_.clicked.connect(self.salir)
-                self.ButtoBorrarTodo.clicked.connect(self.borrarTodo)
+                self.ButtonDescargar.clicked.connect(self.borrarTodo)
                 self.graphicsView.setObjectName("graphicsView")
                 self.groupBox = QtWidgets.QGroupBox(self.widget)
                 self.groupBox.setGeometry(QtCore.QRect(780, 30, 251, 451))
@@ -178,13 +171,12 @@ class Ui_MainWindow(object):
                 _translate = QtCore.QCoreApplication.translate
                 MainWindow.setWindowTitle(_translate("MainWindow", "DataCleanPy"))
                 self.ButtonCargar.setText(_translate("MainWindow", "Cargar datos"))
-                self.ButtoBorrarTodo.setText(_translate("MainWindow", "Borrar todo"))
-                ##self.ButtonDescargar.setText(_translate("MainWindow", "Descargar datos"))
+                self.ButtonDescargar.setText(_translate("MainWindow", "Borrar todo"))
                 self.pushButton_.setText(_translate("MainWindow", "Salir"))
                 self.comboBoxFiltrado.addItem("Interpolación")
                 self.comboBoxFiltrado.addItem("Por desviación estándar")
                 self.comboBoxFiltrado.addItem("Suavizado")
-                self.label.setText(_translate("MainWindow", "Rango de filtrado por fecha:"))
+                self.label.setText(_translate("MainWindow", "Rango de filtrado:"))
                 self.label_2.setText(_translate("MainWindow", "Tipo de filtrado:"))
                 self.label_3.setText(_translate("MainWindow", "Inicio:"))
                 self.label_4.setText(_translate("MainWindow", "Fin:"))
@@ -267,35 +259,6 @@ class Ui_MainWindow(object):
                 self.LabelTipodeDato.setText(dataType)
                 self.message.setText("Datos cargados correctamente")
 
-        def FiltroKalman(self, df, columna):
-                # Crear una copia del DataFrame original
-                df_copy = df.copy()
-                # Asegurarse de que la columna sea numérica
-                df_copy[columna] = pd.to_numeric(df_copy[columna], errors='coerce')
-                # Obtener solo la columna de interés
-                datos = df_copy[columna].values
-                # Crear un filtro de Kalman
-                kf = KalmanFilter(dim_x=2, dim_z=1)
-                # Inicializar el estado inicial y la matriz de covarianza
-                kf.x = np.array([datos[0], 0])
-                kf.P *= 1e6
-
-                # Establecer las matrices de transición y observación
-                kf.F = np.array([[1, 1], [0, 1]])
-                kf.H = np.array([[1, 0]])
-
-                # Establecer las covarianzas del proceso y de la medición
-                kf.Q = np.array([[1, 1], [1, 2]])
-                kf.R = 5
-
-                # Aplicar el filtro de Kalman a los datos
-                predicciones, _ = kf.batch_filter(datos)
-
-                # Reemplazar la columna original con las predicciones del filtro de Kalman
-                df_copy[columna] = predicciones[:, 0]
-
-                return df_copy
-        
 
         def FiltroInterpolacion(self, df,columna):
         # Crear una copia del DataFrame original
@@ -367,9 +330,9 @@ class Ui_MainWindow(object):
                 inicio = int(self.comborangoinicio.currentText())
                 final = int(self.comborangofinal.currentText())
                 
-                print(f"Rango Inicio: {inicio} - Rango final: {final}")
+                ##print(f"Rango Inicio: {inicio} - Rango final: {final}")
                 df_filtrado = self.df.iloc[inicio:final]
-                print(f"Dataset Filtrado: {df_filtrado.shape[0]}")
+                ##print(f"Dataset Filtrado: {df_filtrado.shape[0]}")
 
                 columna = self.Comboboxtipodato.currentText()
                 filtro = self.comboBoxFiltrado.currentText()
@@ -419,6 +382,6 @@ if __name__ == "__main__":
     ui.pushButton_.clicked.connect(ui.salir)
     ui.ButtonCargar.clicked.connect(ui.cargarDatos)
     ui.ButtonAplicar.clicked.connect(ui.aplicar)
-    ui.ButtoBorrarTodo.clicked.connect(ui.borrarTodo)
+    ui.ButtonDescargar.clicked.connect(ui.borrarTodo)
     MainWindow.show()
     sys.exit(app.exec_())
